@@ -1,0 +1,146 @@
+#!groovy
+@Library(value = 'icdc-jenkins-shared-library', changelog = false) _
+
+pipeline {
+  agent {
+    kubernetes {
+      defaultContainer 'jnlp'
+      yaml libraryResource('podTemplates/nodejs/nodejs-14.16.yaml')
+    }
+  }
+
+  options {
+    timestamps()
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    skipDefaultCheckout true
+  }
+
+  stages {
+
+    stage('Checkout from VCS') {
+      steps {
+        //checkout scm
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        container('nodejs') {
+         // npmCi()
+        }
+      }
+    }
+
+    stage('Build Project') {
+      steps {
+        container('nodejs') {
+        //  npmRun npmGoal: 'build:package'
+        }
+      }
+    }
+
+    stage('Prepare for testings') {
+      steps {
+        container('nodejs') {
+          // npmRun npmGoal: 'build:e2e'
+        }
+      }
+    }
+
+    stage('Test Project') {
+      parallel {
+        stage('Unit tests') {
+          steps {
+            container('nodejs') {
+              /* npmTest npmGoal: 'test:reports',
+                publishHtml: true,
+                htmlReportPath: 'reports/coverage',
+                htmlReportName: 'Code coverage',
+                publishXunit: true,
+                xunitReportPattern: 'reports/unit/xunit-report.xml'
+		*/ 
+            }
+          }
+        }
+        stage('Lint & checkstyle') {
+          steps {
+            container('nodejs') {
+             // npmRun npmGoal: 'lint:ci'
+            }
+          }
+        }
+        stage('Chromium e2e tests') {
+          steps {
+            container('nodejs') {
+            //  npmRun npmGoal: 'e2e:chromium'
+            }
+          }
+        }
+        stage('Firefox e2e tests') {
+          steps {
+            container('nodejs') {
+             // npmRun npmGoal: 'e2e:firefox'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Sonar Analysis') {
+      steps {
+        container('sonar') {
+         // sonarScanner()
+        }
+      }
+    }
+
+    stage('Deploy Snapshot') {
+      steps {
+        container('nodejs') {
+          //npmRun npmGoal: 'build:package'
+        }
+       // npmUpload artifactsPattern: 'dist/artifacts/*.tar.gz',
+     //     targetRepository: 'angular-snapshots-local'
+      }
+    }
+
+    stage('Release Bundle') {
+      steps {
+        container('nodejs') {
+         // npmRelease npmGoal: 'build:package'
+        }
+      }
+    }
+
+    stage('Fusion Delivery') {
+      when {
+          branch 'master'
+      }
+      steps {
+       /* fusionDelivery skipUserPrompt: false,
+          applicationName: 'jfrog-ma7',
+          projectName: 'jfrog',
+          resourcePath: 'dist/artifacts',
+          resourceType: 'TAR',
+          packageType: 'WEB-STATIC',
+          environmentCode: 'dv'
+      */
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        bitbucketNotify()
+      }
+    }
+    failure {
+        archiveArtifacts artifacts: 'dist/**, reports/**, out/**', excludes: '**/node_modules/**'
+
+        script {
+        errorEmailNotify()
+      }
+    }
+  }
+}

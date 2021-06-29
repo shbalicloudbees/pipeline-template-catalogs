@@ -1,0 +1,10 @@
+type: pipeline-template
+version: 1
+
+name: Angular Template
+description: Angular Template
+parameters:
+  - name: previewEnvHostname
+    displayName: Preview env hostname
+  - name: emailRecipient
+    displayName: Email address for build notifications
