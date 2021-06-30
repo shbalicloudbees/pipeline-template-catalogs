@@ -1,0 +1,12 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+          steps {
+            echo "${previewEnvHostname}"
+            echo "${emailRecipient}"
+            sh "./mvnw clean install"
+          }
+        }
+    }
+}
