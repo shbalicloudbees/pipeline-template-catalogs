@@ -23,13 +23,25 @@ parameters:
   - name: gitCredentialsId
     type: credentials
     displayName: CredentialsID for GitHub 
+    
 multibranch:
   branchSource:
     github:
-      repoOwner: ${repoOwner}
-      repository: ${repoName}
-      credentialsId: ${gitCredentialsId}
-      traits: 
-        - headRegexFilter: 
-          regex: master
-  scanRepositoryInterval: ${scanRepositoryInterval}
+      repoOwner: ${github_organization}
+      repository: ${github_repo}
+      credentialsId: ${github_creds}
+      traits:
+        - gitHubBranchDiscovery:
+            strategyId: 3
+        - headWildcardFilter:
+            includes: ${headWildcardFilterIncludes}
+            excludes: ${headWildcardFilterExcludes}
+
+    strategy:
+      $class: DefaultBranchPropertyStrategy # All branches get the same properties
+      props:
+        - $class: NoTriggerBranchProperty # Suppress automatic SCM triggering
+
+  orphanedItemStrategy:
+    daysToKeep: 60
+  scanRepositoryInterval: 15 minutes
