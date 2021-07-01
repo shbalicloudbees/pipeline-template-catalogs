@@ -27,9 +27,9 @@ parameters:
 multibranch:
   branchSource:
     github:
-      repoOwner: ${github_organization}
-      repository: ${github_repo}
-      credentialsId: ${github_creds}
+      repoOwner: ${repoOwner}
+      repository: ${repoName}
+      credentialsId: ${gitCredentialsId}
       traits:
         - gitHubBranchDiscovery:
             strategyId: 3
