@@ -1,0 +1,31 @@
+pipeline {
+
+
+  agent {
+    kubernetes {
+      label 'maven-multibranch-app'  
+      idleMinutes 5  
+      yamlFile "${agentYaml}"   
+      defaultContainer 'maven'  
+      //yaml libraryResource("${agentYaml}")
+    }
+  }
+    environment {
+        MAVEN_ADDITIONAL_TARGETS = "${mavenAdditionalTargets}"
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'env'
+            }
+        }
+        stage('Build') {
+            steps {
+                container('maven') {
+                    sh 'mvn clean verify -C -e --show-version'
+                }
+            }
+        }
+    }
+
+}
