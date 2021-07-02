@@ -33,9 +33,6 @@ multibranch:
       traits:
         - gitHubBranchDiscovery:
             strategyId: 3
-        - headWildcardFilter:
-            includes: ${headWildcardFilterIncludes}
-            excludes: ${headWildcardFilterExcludes}
 
     strategy:
       $class: DefaultBranchPropertyStrategy # All branches get the same properties
