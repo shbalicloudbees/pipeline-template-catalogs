@@ -16,6 +16,7 @@ spec:
         limits:
           memory: "1Gi"
 """
+     defaultContainer 'maven'
     }
   }
 
