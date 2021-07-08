@@ -27,7 +27,8 @@ spec:
     stages {
         stage('Test') {
             steps {
-                sh 'env'
+                  echo "${repoOwner}"
+                  echo "${repoName}"
             }
         }
         stage('Build') {
