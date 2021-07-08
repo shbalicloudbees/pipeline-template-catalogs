@@ -23,7 +23,11 @@ spec:
     stages {
         stage('Checkout') { 
             steps {
-                git credentialsId: "${github_creds}" , url: "${github_repo}" 
+                // git credentialsId: "${github_creds}" , url: "${github_repo}" 
+              checkout([$class: 'GitSCM',
+                        branches: [[name: '*/main']], 
+                        extensions: [], 
+                        userRemoteConfigs: [[credentialsId: "${github_creds}", url: "${github_repo}" ]]])
             }
         }
         stage('Build') { 
