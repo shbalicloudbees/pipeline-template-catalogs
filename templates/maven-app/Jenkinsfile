@@ -21,11 +21,14 @@ spec:
   }
 
     stages {
+        stage('Checkout') { 
+            steps {
+                git credentialsId: "${github_creds}" , url: "${github_repo}" 
+            }
+        }
         stage('Build') { 
             steps {
-      
-                echo "${emailRecipient}"
-                sh 'mvn --version' 
+                sh 'mvn -B -DskipTests clean package' 
             }
         }
     }
