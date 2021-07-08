@@ -23,8 +23,9 @@ spec:
     stages {
         stage('Build') { 
             steps {
-                //sh 'mvn -B -DskipTests clean package' 
-                 sh 'mvn --version' 
+      
+                echo "${emailRecipient}"
+                sh 'mvn --version' 
             }
         }
     }
